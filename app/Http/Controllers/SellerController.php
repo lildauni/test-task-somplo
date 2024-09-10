@@ -10,10 +10,10 @@ class SellerController extends Controller
 {
     public function setData(CreateSellerRequest $request)
     {
-        $seller = Seller::create($request->all());
+        $data = $request->validated();
+        $seller = Seller::create($data);
 
         return response()->json([
-            'success' => true,
             'seller' => $seller
         ]);
     }

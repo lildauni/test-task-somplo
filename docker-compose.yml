@@ -7,7 +7,7 @@ services:
       - ./_docker/nginx/conf.d/:/etc/nginx/conf.d
       - ./:/var/www/
     ports:
-      - "8080:80"
+      - "8000:80"
     environment:
       - NGINX_HOST=foobar.com
       - NGINX_PORT=80

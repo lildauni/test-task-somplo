@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 class UtilityService
 {
-    public function parseImgLinks($url)
+    public function getImgLinks(string $url) : array
     {
         $data = Http::get($url);
         $dom = new DOMDocument();

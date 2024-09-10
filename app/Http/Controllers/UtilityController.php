@@ -4,19 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Services\UtilityService;
 use Goutte\Client;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\BrowserKit\HttpBrowser;
 
 class UtilityController extends Controller
 {
-    protected $utilityService;
-    public function __construct(UtilityService $utilityService)
+    public function __construct(private UtilityService $utilityService) {}
+    public function parser(Request $request) : JsonResponse
     {
-        $this->utilityService = $utilityService;
-    }
-    public function parser(Request $request)
-    {
-        $links = $this->utilityService->parseImgLinks('https://rozetka.com.ua/ua/news-articles-promotions/promotions/');
-        return response()->json($links);
+        $links = $this->utilityService->getImgLinks('https://rozetka.com.ua/ua/news-articles-promotions/promotions/');
+        return response()->json(['links' => $links]);
     }
 }

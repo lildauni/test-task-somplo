@@ -3,23 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateProductRequest;
+use App\Http\Requests\BulkInsertProductRequest;
+use App\Http\Requests\BulkUpdateProductRequest;
+use App\Http\Resources\SellerResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    public function setData(CreateProductRequest $request)
+    public function setData(CreateProductRequest $request) : JsonResponse
     {
-        $product = Product::create($request->all());
+        $data = $request->validated();
+        $product = Product::create($data);
 
         return response()->json([
-            'success' => true,
             'product' => $product
         ]);
     }
 
-    public function getData($id)
+    public function getData(int $id) : JsonResponse
     {
         $product = Product::findOrFail($id);
         $data = $product->sellers()
@@ -32,22 +35,13 @@ class ProductController extends Controller
             }])
             ->get();
 
-        $result = $data->map(function ($seller) {
-            return [
-                'seller_name' => $seller->seller_name,
-                'phone_names' => $seller->products->pluck('phone_name'),
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'result' => $result
-        ]);
+        return response()->json(SellerResource::collection($data));
     }
 
-    public function bulkInsert(Request $request)
+    public function bulkInsert(BulkInsertProductRequest $request) : JsonResponse
     {
-        $products = json_decode($request->input('products'), true);
+        $data = $request->validated();
+        $products = $data['products'];
         $productsInsert = array_map(function ($products) {
             unset($products['seller_id']);
             return $products;
@@ -66,19 +60,18 @@ class ProductController extends Controller
             return $data;
         }, []);
 
-        DB::table('seller_product')->insert($insertData);
+        DB::table('product_seller')->insert($insertData);
 
         return response()->json([
             'success' => true
         ]);
     }
 
-    public function updateDataBulk(Request $request)
+    public function updateDataBulk(BulkUpdateProductRequest $request) : JsonResponse
     {
-        $ids = json_decode($request->input('ids'));
-        $cost = $request->input('cost', 0);
+        $data = $request->validated();
 
-        Product::whereIn('id', $ids)->update(['cost' => $cost]);
+        Product::whereIn('id', $data['ids'])->update(['cost' => $data['cost']]);
 
         return response()->json([
             'success' => true

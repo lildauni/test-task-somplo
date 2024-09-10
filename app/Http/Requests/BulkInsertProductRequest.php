@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use \Illuminate\Contracts\Validation\ValidationRule;
 
-class CreateProductRequest extends ApiRequest
+class BulkInsertProductRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,10 +22,7 @@ class CreateProductRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            'phone_name' => 'required|numeric|max_digits:10',
-            'display_size' => 'required|numeric',
-            'quantity' => 'required|numeric',
-            'cost' => 'required|numeric',
+            'products' => 'required|array'
         ];
     }
 }
